@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeadFlow AI — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080810;
+  --surface: #0e0e1a;
+  --surface2: #151525;
+  --border: rgba(255,255,255,0.07);
+  --accent: #7c6ff7;
+  --accent2: #5eead4;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --success: #10d9a0;
+  --warning: #f5a623;
+  --danger: #f87171;
+  --sidebar-w: 224px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; font-size: 14px; }
+
+/* ---- SIDEBAR ---- */
+.sidebar { width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 0 16px; position: fixed; height: 100vh; overflow-y: auto; z-index: 10; }
+.logo { padding: 0 18px 22px; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.nav-section { padding: 0 10px; }
+.nav-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); padding: 10px 10px 4px; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 8px; cursor: pointer; color: var(--muted); font-size: 13px; font-weight: 500; transition: all 0.15s; margin-bottom: 1px; }
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: rgba(124,111,247,0.15); color: var(--accent); }
+.nav-item .ni { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+.badge { margin-left: auto; background: var(--accent); color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 600; }
+.badge-green { background: var(--success); }
+.sync-info { margin-top: auto; padding: 12px 18px 0; }
+.sync-info div:first-child { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.sync-info div:last-child { font-size: 12px; color: var(--text); margin-top: 2px; }
+
+/* ---- MAIN ---- */
+.main { margin-left: var(--sidebar-w); flex: 1; padding: 28px 32px; max-width: calc(100vw - var(--sidebar-w)); min-height: 100vh; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* ---- PAGE HEADER ---- */
+.ph { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+.ph-title { font-family: 'Syne', sans-serif; font-size: 21px; font-weight: 700; }
+.ph-sub { color: var(--muted); font-size: 12px; margin-top: 3px; }
+
+/* ---- STATS ---- */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+.stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.stat-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; line-height: 1; }
+.stat-note { font-size: 11px; margin-top: 5px; }
+
+/* ---- CARD ---- */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.card-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.card-title { font-weight: 600; font-size: 14px; }
+
+/* ---- TABLE ---- */
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; padding: 9px 18px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 11px 18px; font-size: 13px; border-bottom: 1px solid var(--border); }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--surface2); cursor: default; }
+
+/* ---- STATUS ---- */
+.status { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.s-new { background: rgba(100,116,139,0.15); color: #94a3b8; }
+.s-contacted { background: rgba(124,111,247,0.15); color: #a5b4fc; }
+.s-replied { background: rgba(16,217,160,0.15); color: var(--success); }
+.s-quote { background: rgba(245,166,35,0.15); color: var(--warning); }
+.s-won { background: rgba(16,217,160,0.25); color: var(--success); font-weight: 700; }
+
+/* ---- BUTTONS ---- */
+.btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface2); color: var(--text); }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+
+/* ---- INPUTS ---- */
+input, select, textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 8px 12px; outline: none; }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+input::placeholder { color: var(--muted); }
+select option { background: #0e0e1a; }
+label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 5px; }
+
+/* ---- FILTERS ---- */
+.filters { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+
+/* ---- KANBAN ---- */
+.kanban { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; }
+.kb-col { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; min-height: 420px; }
+.kb-col-head { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+.kb-count { background: rgba(255,255,255,0.08); padding: 2px 7px; border-radius: 10px; font-size: 11px; color: var(--muted); }
+.kb-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px; margin-bottom: 7px; transition: border-color 0.15s; cursor: default; }
+.kb-card:hover { border-color: var(--accent); }
+.kb-card-title { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+.kb-card-sub { font-size: 11px; color: var(--muted); }
+.kb-empty { font-size: 12px; color: var(--muted); text-align: center; padding: 20px 0; }
+
+/* ---- INBOX ---- */
+.inbox-item { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; gap: 14px; align-items: flex-start; cursor: pointer; transition: background 0.12s; }
+.inbox-item:last-child { border-bottom: none; }
+.inbox-item:hover { background: var(--surface2); }
+.inbox-item.unread { border-left: 2px solid var(--accent); }
+.in-avatar { width: 36px; height: 36px; background: rgba(124,111,247,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; color: var(--accent); flex-shrink: 0; }
+.in-content { flex: 1; min-width: 0; }
+.in-from { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.in-subject { font-size: 12px; color: var(--muted); margin-bottom: 3px; }
+.in-preview { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.in-meta { text-align: right; flex-shrink: 0; }
+.in-date { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+.sp { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+.sp-interested { background: rgba(16,217,160,0.15); color: var(--success); }
+.sp-needs_followup { background: rgba(245,166,35,0.15); color: var(--warning); }
+.sp-not_interested { background: rgba(248,113,113,0.15); color: var(--danger); }
+.unread-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; margin: 5px auto 0; }
+
+/* ---- AI OUTPUT ---- */
+.ai-out { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; font-size: 13px; line-height: 1.7; white-space: pre-wrap; }
+
+/* ---- SPINNER ---- */
+.spin { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.15); border-top-color: var(--accent); border-radius: 50%; animation: sp 0.7s linear infinite; }
+@keyframes sp { to { transform: rotate(360deg); } }
+
+/* ---- ACTIVITY ---- */
+.act-item { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+.act-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.act-text { font-size: 12px; }
+.act-time { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+/* ---- CHART ---- */
+.chart-area { height: 140px; display: flex; align-items: flex-end; gap: 5px; padding: 14px 18px; }
+.bar-w { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+.bar { width: 100%; border-radius: 3px 3px 0 0; background: var(--accent); opacity: 0.6; transition: opacity 0.12s; }
+.bar:hover { opacity: 1; }
+.bar-lbl { font-size: 10px; color: var(--muted); }
+
+/* ---- PRIORITY ---- */
+.ph-high { color: var(--danger); font-size: 11px; font-weight: 600; }
+.ph-medium { color: var(--warning); font-size: 11px; font-weight: 600; }
+.ph-low { color: var(--muted); font-size: 11px; }
+
+/* ---- TYPE TAG ---- */
+.tag-ai { background: rgba(94,234,212,0.1); color: var(--accent2); font-size: 10px; padding: 2px 7px; border-radius: 10px; }
+.tag-orig { background: rgba(124,111,247,0.1); color: var(--accent); font-size: 10px; padding: 2px 7px; border-radius: 10px; }
+
+/* ---- FORM GROUP ---- */
+.fg { margin-bottom: 14px; }
+.fg input, .fg select, .fg textarea { width: 100%; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.row4 { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
+
+/* ---- EMPTY STATE ---- */
+.empty { text-align: center; padding: 40px 20px; color: var(--muted); }
+.empty-icon { font-size: 28px; margin-bottom: 10px; }
+.empty-title { font-weight: 600; margin-bottom: 5px; font-size: 13px; }
+.empty-text { font-size: 12px; line-height: 1.6; }
+
+/* ---- SETUP ---- */
+.setup-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; margin-bottom: 16px; }
+.setup-card-title { font-weight: 600; font-size: 14px; margin-bottom: 16px; }
+.status-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.status-box { background: var(--surface2); border-radius: 8px; padding: 12px; }
+.status-box-label { font-size: 11px; color: var(--muted); }
+.status-box-val { font-size: 12px; font-weight: 600; margin-top: 4px; }
+
+/* ---- MISC ---- */
+code { background: rgba(124,111,247,0.15); color: var(--accent); padding: 1px 5px; border-radius: 4px; font-family: monospace; font-size: 12px; }
+::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ========== SIDEBAR ========== -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    LeadFlow AI
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <div class="nav-item active" onclick="nav('dashboard')"><span class="ni">📊</span> Dashboard</div>
+
+    <div class="nav-label" style="margin-top:6px">Leads</div>
+    <div class="nav-item" onclick="nav('leads')"><span class="ni">👥</span> All Leads <span class="badge" id="b-leads">0</span></div>
+    <div class="nav-item" onclick="nav('inbox')"><span class="ni">📥</span> Mail Inbox <span class="badge badge-green" id="b-inbox" style="display:none">0</span></div>
+    <div class="nav-item" onclick="nav('pipeline')"><span class="ni">📋</span> Pipeline</div>
+
+    <div class="nav-label" style="margin-top:6px">AI Tools</div>
+    <div class="nav-item" onclick="nav('hunter')"><span class="ni">🎯</span> Lead Hunter</div>
+    <div class="nav-item" onclick="nav('emailai')"><span class="ni">✉️</span> Email AI</div>
+    <div class="nav-item" onclick="nav('quotes')"><span class="ni">💰</span> Quotes</div>
+
+    <div class="nav-label" style="margin-top:6px">System</div>
+    <div class="nav-item" onclick="nav('setup')"><span class="ni">⚙️</span> Setup</div>
+  </div>
+  <div class="sync-info">
+    <div>Last sync</div>
+    <div id="last-sync">Loading…</div>
+  </div>
+</div>
+
+<!-- ========== MAIN ========== -->
+<div class="main">
+
+<!-- ── DASHBOARD ── -->
+<div class="page active" id="pg-dashboard">
+  <div class="ph">
+    <div><div class="ph-title">Dashboard</div><div class="ph-sub" id="greet">LeadFlow is running 🚀</div></div>
+    <button class="btn btn-primary" onclick="nav('hunter')">+ Hunt Leads</button>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total Leads</div><div class="stat-value" id="s-total">0</div><div class="stat-note" style="color:var(--accent)">In database</div></div>
+    <div class="stat-card"><div class="stat-label">Contacted</div><div class="stat-value" id="s-contacted">0</div><div class="stat-note" style="color:var(--muted)">Emails sent</div></div>
+    <div class="stat-card"><div class="stat-label">Replied</div><div class="stat-value" id="s-replied">0</div><div class="stat-note" style="color:var(--warning)">In mail inbox</div></div>
+    <div class="stat-card"><div class="stat-label">Projects Won</div><div class="stat-value" id="s-won">0</div><div class="stat-note" style="color:var(--success)">🎉 Clients closed</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+    <div class="card"><div class="card-header"><span class="card-title">Lead Activity — Last 7 Days</span></div><div class="chart-area" id="chart"></div></div>
+    <div class="card"><div class="card-header"><span class="card-title">Recent Activity</span></div><div style="padding:6px 18px" id="activity"></div></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <div class="card-header"><span class="card-title">Latest Replies 📥</span><button class="btn btn-ghost btn-sm" onclick="nav('inbox')">View all →</button></div>
+    <div id="recent-replies"></div>
+  </div>
+</div>
+
+<!-- ── LEADS ── -->
+<div class="page" id="pg-leads">
+  <div class="ph">
+    <div><div class="ph-title">All Leads</div><div class="ph-sub" id="leads-count"></div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="exportLeads()">⬇ Export JSON</button>
+      <button class="btn btn-primary" onclick="nav('hunter')">+ Add Leads</button>
+    </div>
+  </div>
+  <div class="filters">
+    <input type="text" placeholder="🔍 Search…" id="s-search" oninput="filterLeads()" style="flex:1;min-width:160px">
+    <select id="s-city" onchange="filterLeads()"><option value="">All Cities</option></select>
+    <select id="s-ind" onchange="filterLeads()"><option value="">All Industries</option></select>
+    <select id="s-status" onchange="filterLeads()">
+      <option value="">All Status</option>
+      <option>New</option><option>Contacted</option><option>Replied</option><option>Quote Sent</option><option>Won</option>
+    </select>
+  </div>
+  <div class="card">
+    <table><thead><tr>
+      <th>#</th><th>Business</th><th>City</th><th>Industry</th><th>Service</th><th>Status</th><th>Type</th><th>Priority</th><th>Action</th>
+    </tr></thead>
+    <tbody id="leads-tb"></tbody></table>
+  </div>
+</div>
+
+<!-- ── INBOX (MAIL REPOSITORY) ── -->
+<div class="page" id="pg-inbox">
+  <div class="ph">
+    <div><div class="ph-title">Mail Repository 📥</div><div class="ph-sub">Gmail replies from leads — AI-analyzed and matched</div></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span style="font-size:11px;color:var(--muted)" id="inbox-checked">Not checked yet</span>
+      <button class="btn btn-ghost" onclick="refreshInbox()">⟳ Refresh</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:3fr 2fr;gap:18px">
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Replies</span>
+          <select id="f-sent" onchange="renderInbox()" style="font-size:11px;padding:4px 8px">
+            <option value="">All</option>
+            <option value="interested">🔥 Interested</option>
+            <option value="needs_followup">⚡ Follow-up</option>
+            <option value="not_interested">Declined</option>
+          </select>
+        </div>
+        <div id="inbox-list"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card" id="reply-detail" style="display:none;margin-bottom:14px">
+        <div class="card-header"><span class="card-title">Reply Detail</span></div>
+        <div style="padding:18px" id="reply-detail-inner"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Inbox Stats</span></div>
+        <div style="padding:16px">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center;margin-bottom:16px">
+            <div style="background:rgba(16,217,160,.08);border-radius:8px;padding:10px"><div style="font-size:18px;font-weight:700;color:var(--success)" id="c-int">0</div><div style="font-size:10px;color:var(--muted)">Interested</div></div>
+            <div style="background:rgba(245,166,35,.08);border-radius:8px;padding:10px"><div style="font-size:18px;font-weight:700;color:var(--warning)" id="c-fol">0</div><div style="font-size:10px;color:var(--muted)">Follow-up</div></div>
+            <div style="background:rgba(248,113,113,.08);border-radius:8px;padding:10px"><div style="font-size:18px;font-weight:700;color:var(--danger)" id="c-no">0</div><div style="font-size:10px;color:var(--muted)">Not Int.</div></div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:14px">
+            <div style="font-size:11px;font-weight:600;margin-bottom:8px;color:var(--text)">How to enable reply checking:</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.8">
+              1. Add <code>inbox.json</code> to repo root<br>
+              2. Upload <code>scripts/check_replies.py</code><br>
+              3. Upload <code>.github/workflows/check-replies.yml</code><br>
+              4. Enable IMAP in Gmail → Settings → Forwarding and POP/IMAP
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PIPELINE ── -->
+<div class="page" id="pg-pipeline">
+  <div class="ph"><div><div class="ph-title">Pipeline</div><div class="ph-sub">Kanban view of all leads by stage</div></div></div>
+  <div class="kanban" id="kanban"></div>
+</div>
+
+<!-- ── LEAD HUNTER ── -->
+<div class="page" id="pg-hunter">
+  <div class="ph"><div><div class="ph-title">Lead Hunter 🎯</div><div class="ph-sub">AI finds local businesses that need your services</div></div></div>
+  <div class="card" style="padding:20px;margin-bottom:18px">
+    <div class="row4">
+      <div class="fg" style="margin:0"><label>City</label><input id="h-city" placeholder="e.g. Lahore" style="width:100%"></div>
+      <div class="fg" style="margin:0"><label>Business Type</label><input id="h-ind" placeholder="e.g. restaurants" style="width:100%"></div>
+      <div class="fg" style="margin:0"><label>Service</label><select id="h-svc" style="width:100%"><option>Web Design</option><option>Social Media Design</option><option>Print Design</option><option>Branding</option></select></div>
+      <div class="fg" style="margin:0"><label>&nbsp;</label><button class="btn btn-primary" onclick="huntLeads()" id="h-btn" style="width:100%">🎯 Hunt</button></div>
+    </div>
+  </div>
+  <div id="hunt-loading" style="display:none;text-align:center;padding:36px;color:var(--muted)">
+    <div class="spin" style="width:22px;height:22px;margin:0 auto 10px"></div><div>Claude is hunting leads…</div>
+  </div>
+  <div id="hunt-results" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-weight:600;font-size:14px">Generated Leads</div>
+      <button class="btn btn-primary" onclick="saveHunted()" id="save-btn">💾 Save All to Database</button>
+    </div>
+    <div id="hunt-list"></div>
+  </div>
+</div>
+
+<!-- ── EMAIL AI ── -->
+<div class="page" id="pg-emailai">
+  <div class="ph"><div><div class="ph-title">Email AI ✉️</div><div class="ph-sub">Personalized cold outreach emails for each lead</div></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+    <div>
+      <div class="card" style="padding:18px;margin-bottom:14px">
+        <div class="card-title" style="margin-bottom:14px">Select Lead</div>
+        <div class="fg"><label>Lead</label><select id="el-sel" onchange="updateElInfo()" style="width:100%"><option value="">— Choose a lead —</option></select></div>
+        <div id="el-info" style="font-size:12px;color:var(--muted);min-height:30px;margin-bottom:10px"></div>
+        <button class="btn btn-primary" onclick="genEmail()" id="el-btn" style="width:100%">Generate Email</button>
+      </div>
+      <div class="card" style="padding:18px">
+        <div class="card-title" style="margin-bottom:10px">Extra Context</div>
+        <textarea id="el-note" style="width:100%;min-height:72px;resize:vertical" placeholder="Any specific notes or context…"></textarea>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Generated Email</span><button class="btn btn-ghost btn-sm" id="copy-email" onclick="copyEmail()" style="display:none">Copy</button></div>
+      <div style="padding:18px">
+        <div id="el-loading" style="display:none;text-align:center;padding:20px;color:var(--muted)"><div class="spin" style="margin:0 auto 8px"></div>Writing your email…</div>
+        <div id="el-out" class="ai-out" style="display:none"></div>
+        <div id="el-ph" style="color:var(--muted);font-size:12px;text-align:center;padding:24px 0">Select a lead and click Generate Email</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── QUOTES ── -->
+<div class="page" id="pg-quotes">
+  <div class="ph"><div><div class="ph-title">Quotes 💰</div><div class="ph-sub">AI-written proposals for interested leads</div></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+    <div class="card" style="padding:18px">
+      <div class="card-title" style="margin-bottom:14px">Generate Quote</div>
+      <div class="fg"><label>Lead</label><select id="ql-sel" style="width:100%"><option value="">— Choose a lead —</option></select></div>
+      <div class="fg"><label>Service Package</label>
+        <select id="ql-pkg" style="width:100%">
+          <option>Basic Website — PKR 80,000</option>
+          <option>Business Website — PKR 150,000</option>
+          <option>E-commerce Website — PKR 250,000</option>
+          <option>Social Media Package — PKR 50,000/mo</option>
+          <option>Full Branding — PKR 120,000</option>
+          <option>Custom Package</option>
+        </select>
+      </div>
+      <div class="fg"><label>Notes</label><textarea id="ql-notes" style="width:100%;min-height:60px;resize:vertical" placeholder="Requirements…"></textarea></div>
+      <button class="btn btn-primary" onclick="genQuote()" style="width:100%">Generate Proposal</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Proposal</span><button class="btn btn-ghost btn-sm" id="copy-quote" onclick="copyQuote()" style="display:none">Copy</button></div>
+      <div style="padding:18px">
+        <div id="ql-loading" style="display:none;text-align:center;padding:20px;color:var(--muted)"><div class="spin" style="margin:0 auto 8px"></div>Writing proposal…</div>
+        <div id="ql-out" class="ai-out" style="display:none"></div>
+        <div id="ql-ph" style="color:var(--muted);font-size:12px;text-align:center;padding:24px 0">Select a lead and click Generate Proposal</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SETUP ── -->
+<div class="page" id="pg-setup">
+  <div class="ph">
+    <div><div class="ph-title">Setup ⚙️</div><div class="ph-sub">Configure your LeadFlow AI system</div></div>
+    <button class="btn btn-primary" onclick="saveConfig()">💾 Save Config</button>
+  </div>
+  <div class="setup-card">
+    <div class="setup-card-title">Agency Information</div>
+    <div class="row2">
+      <div class="fg"><label>Agency Name</label><input id="cfg-name" placeholder="Your Studio Name"></div>
+      <div class="fg"><label>From Email (Gmail)</label><input id="cfg-email" type="email" placeholder="you@gmail.com"></div>
+    </div>
+  </div>
+  <div class="setup-card">
+    <div class="setup-card-title">Claude API Key</div>
+    <div class="fg"><label>API Key — used in dashboard for Lead Hunter &amp; Email AI</label><input id="cfg-key" type="password" placeholder="sk-ant-api03-…"></div>
+    <div style="font-size:11px;color:var(--muted);margin-top:-6px">⚠️ Stored in localStorage only. GitHub Actions uses the ANTHROPIC_API_KEY secret separately.</div>
+  </div>
+  <div class="setup-card">
+    <div class="setup-card-title">Targeting</div>
+    <div class="row2">
+      <div class="fg"><label>Target Cities (comma separated)</label><input id="cfg-cities" placeholder="Lahore, Karachi, Islamabad"></div>
+      <div class="fg"><label>Target Industries (comma separated)</label><input id="cfg-ind" placeholder="restaurants, gyms, clinics"></div>
+    </div>
+  </div>
+  <div class="setup-card">
+    <div class="setup-card-title">GitHub Repository</div>
+    <div class="row2">
+      <div class="fg"><label>GitHub Username</label><input id="cfg-user" placeholder="your-username"></div>
+      <div class="fg"><label>Repository Name</label><input id="cfg-repo" placeholder="leadflow"></div>
+    </div>
+  </div>
+  <div class="setup-card" style="border-color:rgba(16,217,160,.15)">
+    <div class="setup-card-title">System Status</div>
+    <div class="status-row">
+      <div class="status-box"><div class="status-box-label">GitHub Actions</div><div class="status-box-val" style="color:var(--success)">✓ Running daily</div></div>
+      <div class="status-box"><div class="status-box-label">Email Sending</div><div class="status-box-val" style="color:var(--success)">✓ Gmail active</div></div>
+      <div class="status-box"><div class="status-box-label">Reply Checking</div><div class="status-box-val" style="color:var(--warning)" id="reply-status">⚡ Set up needed</div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ==================== STATE ====================
+let leads = [], replies = [], cfg = {}, hunted = [], genEmailText = '', genQuoteText = '';
+
+// ==================== NAV ====================
+function nav(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('pg-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') === "nav('"+name+"')") n.classList.add('active');
+  });
+  if (name === 'pipeline') drawKanban();
+  if (name === 'emailai') fillLeadSel('el-sel');
+  if (name === 'quotes') fillLeadSel('ql-sel');
+  if (name === 'inbox') renderInbox();
+}
+
+// ==================== LOAD ====================
+async function load() {
+  try { const r = await fetch('./leads.json'); if (r.ok) { const d = await r.json(); leads = d.leads||[]; document.getElementById('last-sync').textContent = d.last_updated||'—'; } } catch { leads = demoLeads(); document.getElementById('last-sync').textContent = 'Demo mode'; }
+  try { const r = await fetch('./inbox.json'); if (r.ok) { const d = await r.json(); replies = d.replies||[]; document.getElementById('inbox-checked').textContent = 'Last checked: '+(d.last_checked||'Never').split('T')[0]; } } catch { replies = demoReplies(); }
+  try { const r = await fetch('./config.json'); if (r.ok) { cfg = await r.json(); loadCfgForm(); } } catch { cfg = {agency_name:'Your Studio',services:['Web Design','Social Media Design','Print Design','Branding'],target_cities:['Lahore','Karachi','Islamabad'],target_industries:['restaurants','gyms','clinics','law firms','real estate']}; }
+  const k = localStorage.getItem('lf_k'); if (k) cfg.api_key = k;
+  renderAll();
+}
+
+function demoLeads() {
+  return [
+    {id:1,business:'Café Olio',city:'Lahore',industry:'restaurants',service:'Web Design',email:'cafe@olio.pk',why:'No website found',priority:'High',status:'New',type:'AI Generated',date_added:'2026-05-10'},
+    {id:2,business:'Fit Zone Gym',city:'Lahore',industry:'gyms',service:'Social Media Design',email:'hello@fitzone.pk',why:'Outdated social feed',priority:'High',status:'Contacted',type:'AI Generated',date_added:'2026-05-09'},
+    {id:3,business:'Dr. Ahmed Clinic',city:'Karachi',industry:'clinics',service:'Web Design',email:'dr.ahmed@clinic.pk',why:'No online presence',priority:'Medium',status:'Replied',type:'AI Generated',date_added:'2026-05-09'},
+    {id:4,business:'Vertex Law',city:'Islamabad',industry:'law firms',service:'Branding',email:'info@vertexlaw.pk',why:'Outdated brand identity',priority:'High',status:'Quote Sent',type:'Original',date_added:'2026-05-08'},
+    {id:5,business:'Royal Real Estate',city:'Lahore',industry:'real estate',service:'Web Design',email:'royal@estate.pk',why:'Needs lead gen site',priority:'High',status:'Won',type:'AI Generated',date_added:'2026-05-07'},
+  ];
+}
+function demoReplies() {
+  return [
+    {id:'1',from:'Dr. Ahmed <dr.ahmed@clinic.pk>',business:'Dr. Ahmed Clinic',subject:'Re: Quick question about Dr. Ahmed Clinic',body:'Thanks for reaching out! We have been looking for a web designer. Could you send examples of your work and pricing?',ai_summary:'Interested — asking for portfolio and pricing',sentiment:'interested',date_added:'2026-05-10',read:false,lead_id:3},
+    {id:'2',from:'Vertex Law <info@vertexlaw.pk>',business:'Vertex Law',subject:'Re: Quick question about Vertex Law',body:'We are currently working with another agency but will keep you in mind for future projects. Thanks.',ai_summary:'Working with competitor — follow up in 3 months',sentiment:'needs_followup',date_added:'2026-05-09',read:true,lead_id:4},
+  ];
+}
+
+// ==================== RENDER ALL ====================
+function renderAll() {
+  updateStats();
+  renderLeads(leads);
+  renderInbox();
+  renderRecentReplies();
+  renderActivity();
+  renderChart();
+  populateFilters();
+  if (cfg.agency_name) document.getElementById('greet').textContent = 'Welcome back, '+cfg.agency_name+' — LeadFlow is running 🚀';
+}
+
+function updateStats() {
+  document.getElementById('s-total').textContent = leads.length;
+  document.getElementById('s-contacted').textContent = leads.filter(l=>['Contacted','Replied','Quote Sent','Won'].includes(l.status)).length;
+  document.getElementById('s-replied').textContent = leads.filter(l=>l.status==='Replied').length;
+  document.getElementById('s-won').textContent = leads.filter(l=>l.status==='Won').length;
+  document.getElementById('b-leads').textContent = leads.length;
+  document.getElementById('leads-count').textContent = leads.length + ' leads in database';
+  const unread = replies.filter(r=>!r.read).length;
+  const bx = document.getElementById('b-inbox');
+  if (unread > 0) { bx.textContent = unread; bx.style.display = ''; } else { bx.style.display = 'none'; }
+}
+
+// ==================== LEADS TABLE ====================
+function renderLeads(arr) {
+  const tb = document.getElementById('leads-tb');
+  if (!arr.length) { tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--muted)">No leads found. Use Lead Hunter to generate some!</td></tr>'; return; }
+  tb.innerHTML = arr.map(l=>`<tr>
+    <td style="color:var(--muted);font-size:11px">#${l.id}</td>
+    <td style="font-weight:500">${l.business}</td>
+    <td>${l.city}</td>
+    <td style="color:var(--muted)">${l.industry}</td>
+    <td>${l.service}</td>
+    <td><span class="status ${sClass(l.status)}">${l.status}</span></td>
+    <td><span class="${l.type==='AI Generated'?'tag-ai':'tag-orig'}">${l.type==='AI Generated'?'🤖 AI':'✍️ Manual'}</span></td>
+    <td><span class="ph-${(l.priority||'').toLowerCase()}">${l.priority||'—'}</span></td>
+    <td><button class="btn btn-ghost btn-sm" onclick="emailThisLead(${l.id})">Email</button></td>
+  </tr>`).join('');
+}
+function sClass(s){return{New:'s-new',Contacted:'s-contacted',Replied:'s-replied','Quote Sent':'s-quote',Won:'s-won'}[s]||'s-new';}
+function filterLeads() {
+  const q=document.getElementById('s-search').value.toLowerCase(),city=document.getElementById('s-city').value,ind=document.getElementById('s-ind').value,st=document.getElementById('s-status').value;
+  renderLeads(leads.filter(l=>(!q||(l.business+l.email).toLowerCase().includes(q))&&(!city||l.city===city)&&(!ind||l.industry===ind)&&(!st||l.status===st)));
+}
+function populateFilters(){
+  const cities=[...new Set(leads.map(l=>l.city))],inds=[...new Set(leads.map(l=>l.industry))];
+  document.getElementById('s-city').innerHTML='<option value="">All Cities</option>'+cities.map(c=>`<option>${c}</option>`).join('');
+  document.getElementById('s-ind').innerHTML='<option value="">All Industries</option>'+inds.map(i=>`<option>${i}</option>`).join('');
+}
+function exportLeads(){const b=new Blob([JSON.stringify({leads,last_updated:new Date().toISOString().split('T')[0],total_count:leads.length},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='leads.json';a.click();}
+
+// ==================== INBOX ====================
+function renderInbox() {
+  const fil=document.getElementById('f-sent')?.value||'';
+  const arr=fil?replies.filter(r=>r.sentiment===fil):replies;
+  const list=document.getElementById('inbox-list');
+  if (!arr.length){list.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">No replies yet</div><div class="empty-text">Replies from leads will appear here once<br>check_replies.py is running via GitHub Actions.</div></div>';return;}
+  list.innerHTML=arr.map(r=>{
+    const initials=(r.business||r.from||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    return`<div class="inbox-item ${r.read?'':'unread'}" onclick="showReply(${JSON.stringify(r).replace(/"/g,'&quot;')})">\n      <div class="in-avatar">${initials}</div>\n      <div class="in-content">\n        <div class="in-from">${r.business||r.from}</div>\n        <div class="in-subject">${r.subject}</div>\n        <div class="in-preview">${r.ai_summary||r.body}</div>\n      </div>\n      <div class="in-meta">\n        <div class="in-date">${r.date_added||''}</div>\n        <span class="sp sp-${r.sentiment}">${spLabel(r.sentiment)}</span>\n        ${!r.read?'<div class="unread-dot"></div>':''}\n      </div>\n    </div>`;
+  }).join('');
+  document.getElementById('c-int').textContent=replies.filter(r=>r.sentiment==='interested').length;
+  document.getElementById('c-fol').textContent=replies.filter(r=>r.sentiment==='needs_followup').length;
+  document.getElementById('c-no').textContent=replies.filter(r=>r.sentiment==='not_interested').length;
+}
+function spLabel(s){return{interested:'🔥 Interested',needs_followup:'⚡ Follow-up',not_interested:'Declined'}[s]||s;}
+function showReply(r){
+  replies.forEach(x=>{if(x.id===r.id)x.read=true;});
+  updateStats();
+  const card=document.getElementById('reply-detail');
+  card.style.display='';
+  document.getElementById('reply-detail-inner').innerHTML=`
+    <div style="margin-bottom:12px"><div style="font-weight:600;font-size:14px">${r.business||r.from}</div><div style="font-size:11px;color:var(--muted)">${r.from}</div></div>
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px">${r.subject}</div>
+    <div class="ai-out" style="margin-bottom:12px;font-size:12px">${r.body}</div>
+    <div style="background:rgba(124,111,247,.1);border-radius:8px;padding:10px;margin-bottom:14px">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:4px">AI ANALYSIS</div>
+      <div style="font-size:12px">${r.ai_summary}</div>
+      <span class="sp sp-${r.sentiment}" style="margin-top:6px;display:inline-block">${spLabel(r.sentiment)}</span>
+    </div>
+    ${r.sentiment==='interested'?`<button class="btn btn-primary" style="width:100%" onclick="nav('quotes')">💰 Generate Quote →</button>`:''}
+    ${r.sentiment==='needs_followup'?`<button class="btn btn-ghost" style="width:100%" onclick="nav('emailai')">✉️ Write Follow-up →</button>`:''}
+  `;
+}
+function refreshInbox(){document.getElementById('inbox-checked').textContent='Checking…';load();}
+function renderRecentReplies(){
+  const c=document.getElementById('recent-replies'),arr=replies.slice(0,3);
+  if(!arr.length){c.innerHTML='<div class="empty"><div class="empty-text">No replies yet — emails go out daily at 8am PKT</div></div>';return;}
+  c.innerHTML=arr.map(r=>{const ini=(r.business||'?').split(' ').map(w=>w[0]).join('').slice(0,2);return`<div class="inbox-item" onclick="nav('inbox')"><div class="in-avatar">${ini}</div><div class="in-content"><div class="in-from">${r.business||r.from}</div><div class="in-preview">${r.ai_summary||r.body}</div></div><div class="in-meta"><span class="sp sp-${r.sentiment}">${spLabel(r.sentiment)}</span></div></div>`}).join('');
+}
+
+// ==================== KANBAN ====================
+function drawKanban(){
+  const stages=['New','Contacted','Replied','Quote Sent','Won'];
+  const cols={'New':'var(--muted)','Contacted':'var(--accent)','Replied':'var(--warning)','Quote Sent':'var(--warning)','Won':'var(--success)'};
+  document.getElementById('kanban').innerHTML=stages.map(s=>{
+    const sl=leads.filter(l=>l.status===s);
+    return`<div class="kb-col">
+      <div class="kb-col-head"><span style="color:${cols[s]}">${s}</span><span class="kb-count">${sl.length}</span></div>
+      ${sl.map(l=>`<div class="kb-card"><div class="kb-card-title">${l.business}</div><div class="kb-card-sub">${l.city} · ${l.service}</div><div style="margin-top:5px"><span class="ph-${(l.priority||'').toLowerCase()}" style="font-size:10px">${l.priority||''}</span></div></div>`).join('')}
+      ${!sl.length?'<div class="kb-empty">Empty</div>':''}
+    </div>`;
+  }).join('');
+}
+
+// ==================== CHART ====================
+function renderChart(){
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],data=[3,5,2,8,6,4,leads.length%10||7],mx=Math.max(...data);
+  document.getElementById('chart').innerHTML=data.map((v,i)=>`<div class="bar-w"><div class="bar" style="height:${Math.round(v/mx*110)}px" title="${v} leads"></div><div class="bar-lbl">${days[i]}</div></div>`).join('');
+}
+function renderActivity(){
+  const feed=document.getElementById('activity'),items=[];
+  leads.slice(-5).reverse().forEach(l=>items.push({col:'var(--accent)',text:`${l.business} added — ${l.service}`,time:l.date_added}));
+  replies.slice(-3).forEach(r=>items.push({col:'var(--success)',text:`${r.business} replied to your email`,time:r.date_added}));
+  if(!items.length){feed.innerHTML='<div class="empty"><div class="empty-text">No activity yet</div></div>';return;}
+  feed.innerHTML=items.slice(0,7).map(a=>`<div class="act-item"><div class="act-dot" style="background:${a.col}"></div><div><div class="act-text">${a.text}</div><div class="act-time">${a.time}</div></div></div>`).join('');
+}
+
+// ==================== LEAD HUNTER ====================
+async function huntLeads(){
+  const city=document.getElementById('h-city').value.trim()||(cfg.target_cities||['Lahore'])[0];
+  const ind=document.getElementById('h-ind').value.trim()||'restaurants';
+  const svc=document.getElementById('h-svc').value;
+  const key=cfg.api_key||localStorage.getItem('lf_k');
+  if(!key){alert('⚠️ Add your Claude API key in Setup first!');nav('setup');return;}
+  document.getElementById('hunt-loading').style.display='';document.getElementById('hunt-results').style.display='none';document.getElementById('h-btn').disabled=true;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Generate 5 realistic leads for ${ind} businesses in ${city} Pakistan that need ${svc}. Return ONLY a JSON array: [{"business":"Name","city":"${city}","industry":"${ind}","service":"${svc}","email":"realistic@example.com","why":"reason in one sentence","priority":"High"}]. Realistic Pakistani business emails. JSON only, no markdown.`}]})});
+    const d=await res.json();const txt=d.content[0].text;const m=txt.match(/\[\s\S]*\]/);
+    hunted=m?JSON.parse(m[0]):[];
+    document.getElementById('hunt-list').innerHTML=hunted.map((l,i)=>`<div class="card" style="padding:14px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:600;font-size:13px;margin-bottom:2px">${l.business}</div><div style="font-size:12px;color:var(--muted)">${l.city} · ${l.industry} · ${l.email}</div><div style="font-size:11px;color:var(--accent2);margin-top:3px">💡 ${l.why}</div></div><span class="ph-${(l.priority||'').toLowerCase()}">${l.priority}</span></div>`).join('');
+    document.getElementById('hunt-results').style.display='';
+  }catch(e){alert('Error: '+e.message+'\n\nCheck API key in Setup.');}
+  document.getElementById('hunt-loading').style.display='none';document.getElementById('h-btn').disabled=false;
+}
+function saveHunted(){
+  const next=leads.length+1;
+  hunted.forEach((l,i)=>leads.push({...l,id:next+i,status:'New',type:'AI Generated',date_added:new Date().toISOString().split('T')[0]}));
+  renderAll();document.getElementById('hunt-results').style.display='none';
+  alert('✅ '+hunted.length+' leads saved!\n\nClick Export JSON to download and upload to GitHub.');
+  hunted=[];
+}
+
+// ==================== EMAIL AI ====================
+function fillLeadSel(id){const sel=document.getElementById(id);const cur=sel.value;sel.innerHTML='<option value="">— Choose a lead —</option>'+leads.map(l=>`<option value="${l.id}">${l.business} (${l.city})</option>`).join('');if(cur)sel.value=cur;}
+function updateElInfo(){const id=+document.getElementById('el-sel').value,l=leads.find(x=>x.id===id);document.getElementById('el-info').textContent=l?`${l.industry} · ${l.city} · ${l.service} · ${l.email}`:'';}  
+function emailThisLead(id){nav('emailai');setTimeout(()=>{fillLeadSel('el-sel');document.getElementById('el-sel').value=id;updateElInfo();},50);}
+async function genEmail(){
+  const id=+document.getElementById('el-sel').value,l=leads.find(x=>x.id===id);
+  if(!l){alert('Select a lead first');return;}
+  const key=cfg.api_key||localStorage.getItem('lf_k');
+  if(!key){alert('Add API key in Setup');nav('setup');return;}
+  const note=document.getElementById('el-note').value;
+  document.getElementById('el-loading').style.display='';document.getElementById('el-out').style.display='none';document.getElementById('el-ph').style.display='none';document.getElementById('el-btn').disabled=true;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:`Write a cold outreach email from ${cfg.agency_name||'Our Studio'} to ${l.business}, a ${l.industry} in ${l.city}. We offer ${l.service}. Reason: ${l.why}.${note?' Context: '+note:''} Under 120 words. Friendly. Soft CTA. Start with "Hi ${l.business} Team,". No subject line.`}]})}); 
+    const d=await res.json();genEmailText=d.content[0].text;
+    document.getElementById('el-out').textContent=genEmailText;document.getElementById('el-out').style.display='';document.getElementById('copy-email').style.display='';
+  }catch(e){alert('Error: '+e.message);}
+  document.getElementById('el-loading').style.display='none';document.getElementById('el-btn').disabled=false;
+}
+function copyEmail(){navigator.clipboard.writeText(genEmailText);document.getElementById('copy-email').textContent='✓ Copied!';setTimeout(()=>document.getElementById('copy-email').textContent='Copy',2000);}
+
+// ==================== QUOTES ====================
+async function genQuote(){
+  const id=+document.getElementById('ql-sel').value,l=leads.find(x=>x.id===id);
+  if(!l){alert('Select a lead first');return;}
+  const key=cfg.api_key||localStorage.getItem('lf_k');
+  if(!key){alert('Add API key in Setup');nav('setup');return;}
+  const pkg=document.getElementById('ql-pkg').value,notes=document.getElementById('ql-notes').value;
+  document.getElementById('ql-loading').style.display='';document.getElementById('ql-out').style.display='none';document.getElementById('ql-ph').style.display='none';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:`Write a project proposal from ${cfg.agency_name||'Our Studio'} for ${l.business} (${l.industry} in ${l.city}). Package: ${pkg}.${notes?' Notes: '+notes:''} Include: greeting, overview, what's included (3-4 items), timeline, pricing, call to action.`}]})}); 
+    const d=await res.json();genQuoteText=d.content[0].text;
+    document.getElementById('ql-out').textContent=genQuoteText;document.getElementById('ql-out').style.display='';document.getElementById('copy-quote').style.display='';
+  }catch(e){alert('Error: '+e.message);}
+  document.getElementById('ql-loading').style.display='none';
+}
+function copyQuote(){navigator.clipboard.writeText(genQuoteText);document.getElementById('copy-quote').textContent='✓ Copied!';setTimeout(()=>document.getElementById('copy-quote').textContent='Copy',2000);}
+
+// ==================== SETUP ====================
+function loadCfgForm(){
+  if(cfg.agency_name)document.getElementById('cfg-name').value=cfg.agency_name;
+  if(cfg.from_email)document.getElementById('cfg-email').value=cfg.from_email;
+  if(cfg.target_cities)document.getElementById('cfg-cities').value=cfg.target_cities.join(', ');
+  if(cfg.target_industries)document.getElementById('cfg-ind').value=cfg.target_industries.join(', ');
+  const k=localStorage.getItem('lf_k');if(k)document.getElementById('cfg-key').value=k;
+}
+function saveConfig(){
+  cfg.agency_name=document.getElementById('cfg-name').value;
+  cfg.from_email=document.getElementById('cfg-email').value;
+  cfg.target_cities=document.getElementById('cfg-cities').value.split(',').map(s=>s.trim()).filter(Boolean);
+  cfg.target_industries=document.getElementById('cfg-ind').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const k=document.getElementById('cfg-key').value;if(k){cfg.api_key=k;localStorage.setItem('lf_k',k);}
+  document.getElementById('greet').textContent='Welcome back, '+cfg.agency_name+' — LeadFlow is running 🚀';
+  alert('✅ Saved!\n\nTo persist: download and re-upload config.json to GitHub.');
+}
+
+// ==================== BOOT ====================
+load();
+</script>
+</body>
+</html>
