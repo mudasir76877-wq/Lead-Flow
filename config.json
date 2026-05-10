@@ -1,0 +1,24 @@
+{
+  "agency_name": "Your Studio Name",
+      "from_email": "you@gmail.com",
+      "services": [
+        "Web Design",
+        "Social Media Design",
+        "Print Design",
+        "Branding"
+      ],
+      "target_cities": [
+        "Lahore",
+        "Karachi",
+        "Islamabad"
+      ],
+      "target_industries": [
+        "restaurants",
+        "gyms",
+        "clinics",
+        "law firms",
+        "real estate"
+      ],
+      "leads_per_run": 10,
+      "email_delay_seconds": 30
+    }
