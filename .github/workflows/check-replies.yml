@@ -1,0 +1,29 @@
+name: Check Email Replies
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-replies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install anthropic
+      - name: Check Gmail for replies
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+        run: python scripts/check_replies.py
+      - name: Commit inbox and lead updates
+        run: |
+          git config user.name "LeadFlow Bot"
+          git config user.email "bot@leadflow.ai"
+          git add inbox.json leads.json
+          git diff --staged --quiet || git commit -m "Auto: inbox synced $(date +%Y-%m-%d-%H%M)"
+          git push
