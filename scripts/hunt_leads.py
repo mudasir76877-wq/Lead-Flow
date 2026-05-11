@@ -1,10 +1,12 @@
-import anthropic
+import google.generativeai as genai
 import json
 import os
 import re
 from datetime import date
 
-client = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
+# 100% FREE - Google Gemini API (aistudio.google.com)
+genai.configure(api_key=os.environ['GEMINI_API_KEY'])
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 with open('config.json') as f:
     config = json.load(f)
@@ -17,25 +19,23 @@ count = config.get('leads_per_run', 5)
 for city in config['target_cities']:
     for industry in config['target_industries']:
         prompt = (
-            f"Generate {count} realistic business leads for {industry} in {city}, Pakistan. "
-            "Return ONLY a valid JSON array. Each item must have exactly these keys: "
-            "business, city, industry, service, email, why, priority. "
-            f"City must be '{city}', industry must be '{industry}', service must be 'Web Design'. "
-            "Use realistic Pakistani business email addresses. "
-            "Example format: "
-            '[{"business":"Example Cafe","city":"Lahore","industry":"restaurants",'
-            '"service":"Web Design","email":"info@example.pk",'
-            '"why":"No website found","priority":"High"}]'
+            f"Generate {count} realistic {industry} business leads in {city}. "
+            "Return ONLY a JSON array, no extra text, no markdown. "
+            "Each object must have: business, city, industry, service, email, why, priority. "
+            f"city='{city}', industry='{industry}', service='Web Design'. "
+            "Use realistic local email addresses. "
+            "Example: "
+            '[{"business":"Blue Ocean Cafe","city":"London","industry":"restaurants",'
+            '"service":"Web Design","email":"info@blueocean.co.uk",'
+            '"why":"No website found online","priority":"High"}]'
         )
-        msg = client.messages.create(
-            model='claude-sonnet-4-5',
-            max_tokens=1500,
-            messages=[{'role': 'user', 'content': prompt}]
-        )
-        text = msg.content[0].text
-        m = re.search(r'\[.*?\]', text, re.DOTALL)
-        if m:
-            try:
+        try:
+            response = model.generate_content(prompt)
+            text = response.text.strip()
+            # Remove markdown if present
+            text = re.sub(r'```json|```', '', text).strip()
+            m = re.search(r'\[.*?\]', text, re.DOTALL)
+            if m:
                 new_leads = json.loads(m.group())
                 for lead in new_leads:
                     lead['id'] = len(db['leads']) + 1
@@ -43,9 +43,11 @@ for city in config['target_cities']:
                     lead['type'] = 'AI Generated'
                     lead['date_added'] = str(date.today())
                     db['leads'].append(lead)
-                print(f"Added {len(new_leads)} leads for {industry} in {city}")
-            except json.JSONDecodeError as e:
-                print(f"JSON error for {industry}/{city}: {e}")
+                print(f"WizoLabs: Added {len(new_leads)} leads - {industry} in {city}")
+            else:
+                print(f"No JSON found for {industry}/{city}")
+        except Exception as e:
+            print(f"Error for {industry}/{city}: {e}")
 
 db['last_updated'] = str(date.today())
 db['total_count'] = len(db['leads'])
@@ -53,4 +55,4 @@ db['total_count'] = len(db['leads'])
 with open('leads.json', 'w') as f:
     json.dump(db, f, indent=2)
 
-print(f"Done. Total leads in database: {len(db['leads'])}")
+print(f"Done! WizoLabs database: {len(db['leads'])} international leads.")
