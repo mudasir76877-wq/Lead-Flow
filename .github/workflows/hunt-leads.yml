@@ -5,23 +5,27 @@ on:
     - cron: '0 3 * * *'
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   hunt:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install google-generativeai
-      - name: Hunt leads
+      - name: Install Gemini FREE
+        run: pip install google-generativeai
+      - name: Hunt WizoLabs international leads
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/hunt_leads.py
-      - name: Commit leads
+      - name: Save leads to repo
         run: |
-          git config user.name "LeadFlow Bot"
-          git config user.email "bot@leadflow.ai"
+          git config user.name "WizoLabs Bot"
+          git config user.email "bot@wizolabs.com"
           git add leads.json
-          git diff --staged --quiet || git commit -m "Auto: leads updated $(date +%Y-%m-%d)"
+          git diff --staged --quiet || git commit -m "WizoLabs: leads updated $(date +%Y-%m-%d)"
           git push
