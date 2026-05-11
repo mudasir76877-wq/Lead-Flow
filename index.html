@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LeadFlow AI — Dashboard</title>
+<title>WizoLabs AI — Client Acquisition</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -11,8 +11,8 @@
   --surface: #0e0e1a;
   --surface2: #151525;
   --border: rgba(255,255,255,0.07);
-  --accent: #7c6ff7;
-  --accent2: #5eead4;
+  --accent: #0ea5e9;
+  --accent2: #38bdf8;
   --text: #e2e8f0;
   --muted: #64748b;
   --success: #10d9a0;
@@ -26,7 +26,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 /* ---- SIDEBAR ---- */
 .sidebar { width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 0 16px; position: fixed; height: 100vh; overflow-y: auto; z-index: 10; }
 .logo { padding: 0 18px 22px; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 10px; }
-.logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, #0ea5e9, #38bdf8); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
 .nav-section { padding: 0 10px; }
 .nav-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); padding: 10px 10px 4px; }
 .nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 8px; cursor: pointer; color: var(--muted); font-size: 13px; font-weight: 500; transition: all 0.15s; margin-bottom: 1px; }
@@ -184,7 +184,7 @@ code { background: rgba(124,111,247,0.15); color: var(--accent); padding: 1px 5p
 <div class="sidebar">
   <div class="logo">
     <div class="logo-icon">⚡</div>
-    LeadFlow AI
+    WizoLabs AI
   </div>
   <div class="nav-section">
     <div class="nav-label">Overview</div>
@@ -215,7 +215,7 @@ code { background: rgba(124,111,247,0.15); color: var(--accent); padding: 1px 5p
 <!-- ── DASHBOARD ── -->
 <div class="page active" id="pg-dashboard">
   <div class="ph">
-    <div><div class="ph-title">Dashboard</div><div class="ph-sub" id="greet">LeadFlow is running 🚀</div></div>
+    <div><div class="ph-title">Dashboard</div><div class="ph-sub" id="greet">WizoLabs AI is running 🚀</div></div>
     <button class="btn btn-primary" onclick="nav('hunter')">+ Hunt Leads</button>
   </div>
   <div class="stats-grid">
@@ -323,7 +323,7 @@ code { background: rgba(124,111,247,0.15); color: var(--accent); padding: 1px 5p
   <div class="ph"><div><div class="ph-title">Lead Hunter 🎯</div><div class="ph-sub">AI finds local businesses that need your services</div></div></div>
   <div class="card" style="padding:20px;margin-bottom:18px">
     <div class="row4">
-      <div class="fg" style="margin:0"><label>City</label><input id="h-city" placeholder="e.g. Lahore" style="width:100%"></div>
+      <div class="fg" style="margin:0"><label>City</label><input id="h-city" placeholder="e.g. London" style="width:100%"></div>
       <div class="fg" style="margin:0"><label>Business Type</label><input id="h-ind" placeholder="e.g. restaurants" style="width:100%"></div>
       <div class="fg" style="margin:0"><label>Service</label><select id="h-svc" style="width:100%"><option>Web Design</option><option>Social Media Design</option><option>Print Design</option><option>Branding</option></select></div>
       <div class="fg" style="margin:0"><label>&nbsp;</label><button class="btn btn-primary" onclick="huntLeads()" id="h-btn" style="width:100%">🎯 Hunt</button></div>
@@ -377,11 +377,11 @@ code { background: rgba(124,111,247,0.15); color: var(--accent); padding: 1px 5p
       <div class="fg"><label>Lead</label><select id="ql-sel" style="width:100%"><option value="">— Choose a lead —</option></select></div>
       <div class="fg"><label>Service Package</label>
         <select id="ql-pkg" style="width:100%">
-          <option>Basic Website — PKR 80,000</option>
-          <option>Business Website — PKR 150,000</option>
-          <option>E-commerce Website — PKR 250,000</option>
-          <option>Social Media Package — PKR 50,000/mo</option>
-          <option>Full Branding — PKR 120,000</option>
+          <option>Basic Website — $500</option>
+          <option>Business Website — $1,200</option>
+          <option>E-commerce Website — $2,500</option>
+          <option>Social Media Package — $400/mo</option>
+          <option>Full Branding — $900</option>
           <option>Custom Package</option>
         </select>
       </div>
@@ -402,13 +402,13 @@ code { background: rgba(124,111,247,0.15); color: var(--accent); padding: 1px 5p
 <!-- ── SETUP ── -->
 <div class="page" id="pg-setup">
   <div class="ph">
-    <div><div class="ph-title">Setup ⚙️</div><div class="ph-sub">Configure your LeadFlow AI system</div></div>
+    <div><div class="ph-title">Setup ⚙️</div><div class="ph-sub">Configure your WizoLabs AI system</div></div>
     <button class="btn btn-primary" onclick="saveConfig()">💾 Save Config</button>
   </div>
   <div class="setup-card">
     <div class="setup-card-title">Agency Information</div>
     <div class="row2">
-      <div class="fg"><label>Agency Name</label><input id="cfg-name" placeholder="Your Studio Name"></div>
+      <div class="fg"><label>Agency Name</label><input id="cfg-name" placeholder="WizoLabs"></div>
       <div class="fg"><label>From Email (Gmail)</label><input id="cfg-email" type="email" placeholder="you@gmail.com"></div>
     </div>
   </div>
@@ -420,8 +420,8 @@ code { background: rgba(124,111,247,0.15); color: var(--accent); padding: 1px 5p
   <div class="setup-card">
     <div class="setup-card-title">Targeting</div>
     <div class="row2">
-      <div class="fg"><label>Target Cities (comma separated)</label><input id="cfg-cities" placeholder="Lahore, Karachi, Islamabad"></div>
-      <div class="fg"><label>Target Industries (comma separated)</label><input id="cfg-ind" placeholder="restaurants, gyms, clinics"></div>
+      <div class="fg"><label>Target Cities (comma separated)</label><input id="cfg-cities" placeholder="London, New York, Dubai"></div>
+      <div class="fg"><label>Target Industries (comma separated)</label><input id="cfg-ind" placeholder="restaurants, law firms, clinics"></div>
     </div>
   </div>
   <div class="setup-card">
@@ -465,18 +465,18 @@ function nav(name) {
 async function load() {
   try { const r = await fetch('./leads.json'); if (r.ok) { const d = await r.json(); leads = d.leads||[]; document.getElementById('last-sync').textContent = d.last_updated||'—'; } } catch { leads = demoLeads(); document.getElementById('last-sync').textContent = 'Demo mode'; }
   try { const r = await fetch('./inbox.json'); if (r.ok) { const d = await r.json(); replies = d.replies||[]; document.getElementById('inbox-checked').textContent = 'Last checked: '+(d.last_checked||'Never').split('T')[0]; } } catch { replies = demoReplies(); }
-  try { const r = await fetch('./config.json'); if (r.ok) { cfg = await r.json(); loadCfgForm(); } } catch { cfg = {agency_name:'Your Studio',services:['Web Design','Social Media Design','Print Design','Branding'],target_cities:['Lahore','Karachi','Islamabad'],target_industries:['restaurants','gyms','clinics','law firms','real estate']}; }
+  try { const r = await fetch('./config.json'); if (r.ok) { cfg = await r.json(); loadCfgForm(); } } catch { cfg = {agency_name:'Your Studio',services:['Web Design','Social Media Design','Print Design','Branding'],target_cities:['London','New York','Dubai'],target_industries:['restaurants','gyms','clinics','law firms','real estate']}; }
   const k = localStorage.getItem('lf_k'); if (k) cfg.api_key = k;
   renderAll();
 }
 
 function demoLeads() {
   return [
-    {id:1,business:'Café Olio',city:'Lahore',industry:'restaurants',service:'Web Design',email:'cafe@olio.pk',why:'No website found',priority:'High',status:'New',type:'AI Generated',date_added:'2026-05-10'},
-    {id:2,business:'Fit Zone Gym',city:'Lahore',industry:'gyms',service:'Social Media Design',email:'hello@fitzone.pk',why:'Outdated social feed',priority:'High',status:'Contacted',type:'AI Generated',date_added:'2026-05-09'},
-    {id:3,business:'Dr. Ahmed Clinic',city:'Karachi',industry:'clinics',service:'Web Design',email:'dr.ahmed@clinic.pk',why:'No online presence',priority:'Medium',status:'Replied',type:'AI Generated',date_added:'2026-05-09'},
-    {id:4,business:'Vertex Law',city:'Islamabad',industry:'law firms',service:'Branding',email:'info@vertexlaw.pk',why:'Outdated brand identity',priority:'High',status:'Quote Sent',type:'Original',date_added:'2026-05-08'},
-    {id:5,business:'Royal Real Estate',city:'Lahore',industry:'real estate',service:'Web Design',email:'royal@estate.pk',why:'Needs lead gen site',priority:'High',status:'Won',type:'AI Generated',date_added:'2026-05-07'},
+    {id:1,business:'Café Olio',city:'London',industry:'restaurants',service:'Web Design',email:'cafe@olio.pk',why:'No website found',priority:'High',status:'New',type:'AI Generated',date_added:'2026-05-10'},
+    {id:2,business:'Fit Zone Gym',city:'London',industry:'gyms',service:'Social Media Design',email:'hello@fitzone.pk',why:'Outdated social feed',priority:'High',status:'Contacted',type:'AI Generated',date_added:'2026-05-09'},
+    {id:3,business:'Dr. Ahmed Clinic',city:'New York',industry:'clinics',service:'Web Design',email:'dr.ahmed@clinic.pk',why:'No online presence',priority:'Medium',status:'Replied',type:'AI Generated',date_added:'2026-05-09'},
+    {id:4,business:'Vertex Law',city:'Dubai',industry:'law firms',service:'Branding',email:'info@vertexlaw.pk',why:'Outdated brand identity',priority:'High',status:'Quote Sent',type:'Original',date_added:'2026-05-08'},
+    {id:5,business:'Royal Real Estate',city:'London',industry:'real estate',service:'Web Design',email:'royal@estate.pk',why:'Needs lead gen site',priority:'High',status:'Won',type:'AI Generated',date_added:'2026-05-07'},
   ];
 }
 function demoReplies() {
@@ -495,7 +495,7 @@ function renderAll() {
   renderActivity();
   renderChart();
   populateFilters();
-  if (cfg.agency_name) document.getElementById('greet').textContent = 'Welcome back, '+cfg.agency_name+' — LeadFlow is running 🚀';
+  if (cfg.agency_name) document.getElementById('greet').textContent = 'Welcome back, '+cfg.agency_name+' — WizoLabs AI is running 🚀';
 }
 
 function updateStats() {
@@ -574,7 +574,7 @@ function showReply(r){
 function refreshInbox(){document.getElementById('inbox-checked').textContent='Checking…';load();}
 function renderRecentReplies(){
   const c=document.getElementById('recent-replies'),arr=replies.slice(0,3);
-  if(!arr.length){c.innerHTML='<div class="empty"><div class="empty-text">No replies yet — emails go out daily at 8am PKT</div></div>';return;}
+  if(!arr.length){c.innerHTML='<div class="empty"><div class="empty-text">No replies yet — emails go out daily at 9am UTC</div></div>';return;}
   c.innerHTML=arr.map(r=>{const ini=(r.business||'?').split(' ').map(w=>w[0]).join('').slice(0,2);return`<div class="inbox-item" onclick="nav('inbox')"><div class="in-avatar">${ini}</div><div class="in-content"><div class="in-from">${r.business||r.from}</div><div class="in-preview">${r.ai_summary||r.body}</div></div><div class="in-meta"><span class="sp sp-${r.sentiment}">${spLabel(r.sentiment)}</span></div></div>`}).join('');
 }
 
@@ -681,7 +681,7 @@ function saveConfig(){
   cfg.target_cities=document.getElementById('cfg-cities').value.split(',').map(s=>s.trim()).filter(Boolean);
   cfg.target_industries=document.getElementById('cfg-ind').value.split(',').map(s=>s.trim()).filter(Boolean);
   const k=document.getElementById('cfg-key').value;if(k){cfg.api_key=k;localStorage.setItem('lf_k',k);}
-  document.getElementById('greet').textContent='Welcome back, '+cfg.agency_name+' — LeadFlow is running 🚀';
+  document.getElementById('greet').textContent='Welcome back, '+cfg.agency_name+' — WizoLabs AI is running 🚀';
   alert('✅ Saved!\n\nTo persist: download and re-upload config.json to GitHub.');
 }
 
